@@ -135,12 +135,15 @@ const productRoutes = require('./routes/product.routes');
 const app = express();
 
 const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:3001',
-  'http://localhost:5173',
-  'https://your-frontend.vercel.app'
+ 'https://wild-be.vercel.app',
+  'https://sohwaisdash.vercel.app'
 ];
-
+// const allowedOrigins = [
+//   'http://localhost:3000',
+//   'http://localhost:3001',
+//   'http://localhost:5173',
+//   'https://sohwaisdash.vercel.app/'
+// ];
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
