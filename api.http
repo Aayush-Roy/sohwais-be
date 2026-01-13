@@ -1,0 +1,409 @@
+@baseUrl = http://localhost:5000
+@api = {{baseUrl}}/api/products
+
+### 1. HEALTH CHECK
+GET {{baseUrl}}/health
+
+### 2. CREATE PRODUCT WITH IMAGE URLS (JSON)
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Traditional Silk Saree",
+  "category": "Saree",
+  "price": 2999,
+  "discount": 10,
+  "stock": 50,
+  "description": "Pure silk saree with traditional zari border. Perfect for weddings and festivals.",
+  "variants": [
+    {
+      "color": "#FF0000",
+      "size": "M",
+      "price": 2999
+    },
+    {
+      "color": "#0000FF",
+      "size": "L",
+      "price": 3199
+    },
+    {
+      "color": "#008000",
+      "size": "XL",
+      "price": 3299
+    }
+  ],
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1603178455927-1b0eec2c4ac6",
+    "https://images.unsplash.com/photo-1568259550238-762d5f3d8e7f"
+  ]
+}
+
+### 3. CREATE PRODUCT WITH IMAGE URLS (SINGLE COLOR)
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Cotton Kurti Set",
+  "category": "Kurti",
+  "price": 1499,
+  "discount": 15,
+  "stock": 100,
+  "description": "Comfortable cotton kurti with matching palazzo. Perfect for daily wear.",
+  "variants": [
+    {
+      "color": "#FFC0CB",
+      "size": "S",
+      "price": 1499
+    }
+  ],
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1584917865442-de89df76afd3"
+  ]
+}
+
+### 4. CREATE PRODUCT WITH NO DISCOUNT
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Designer Lehenga Choli",
+  "category": "Lehenga",
+  "price": 8999,
+  "discount": 0,
+  "stock": 20,
+  "status": "Active",
+  "description": "Heavy designer lehenga for wedding occasions with intricate embroidery work.",
+  "variants": [
+    {
+      "color": "#800080",
+      "size": "M",
+      "price": 8999
+    },
+    {
+      "color": "#FFD700",
+      "size": "L",
+      "price": 9499
+    }
+  ],
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1595777457583-95e059d581b8"
+  ]
+}
+
+### 5. CREATE PRODUCT WITH FILE UPLOAD
+### Note: This requires a tool like REST Client VSCode extension that supports file upload
+### Or use Postman/Insomnia
+POST {{api}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+Handwoven Shawl
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+Shawl
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+899
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="discount"
+
+5
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+75
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="description"
+
+Pashmina handwoven shawl with traditional patterns
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="variants"
+
+[{"color": "#A52A2A", "size": "M", "price": 899}]
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="shawl1.jpg"
+Content-Type: image/jpeg
+
+< ./shawl1.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="shawl2.jpg"
+Content-Type: image/jpeg
+
+< ./shawl2.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+### 6. GET ALL PRODUCTS
+GET {{api}}
+
+### 7. GET ALL PRODUCTS (With specific response fields - if needed)
+GET {{api}}?fields=name,price,category
+
+### 8. GET SINGLE PRODUCT BY ID
+### Replace :id with actual product ID from previous responses
+@productId = {{create_product.response.body.data._id}}
+GET {{api}}/{{productId}}
+
+### 9. UPDATE PRODUCT - CHANGE STOCK AND STATUS
+PUT {{api}}/{{productId}}
+Content-Type: application/json
+
+{
+  "stock": 45,
+  "status": "Active",
+  "description": "Pure silk saree with traditional zari border. Perfect for weddings and festivals. Now with additional color options!"
+}
+
+### 10. UPDATE PRODUCT - ADD NEW VARIANTS
+PUT {{api}}/{{productId}}
+Content-Type: application/json
+
+{
+  "variants": [
+    {
+      "color": "#FF0000",
+      "size": "M",
+      "price": 2999
+    },
+    {
+      "color": "#0000FF",
+      "size": "L",
+      "price": 3199
+    },
+    {
+      "color": "#008000",
+      "size": "XL",
+      "price": 3299
+    },
+    {
+      "color": "#FFFF00",
+      "size": "S",
+      "price": 2899
+    }
+  ]
+}
+
+### 11. UPDATE PRODUCT - ADD NEW IMAGE URLS
+PUT {{api}}/{{productId}}
+Content-Type: application/json
+
+{
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1595777457583-95e059d581b8",
+    "https://images.unsplash.com/photo-1585487000160-6eb9ce6b5a59"
+  ]
+}
+
+### 12. UPDATE PRODUCT WITH FILE UPLOAD
+### Note: This requires a tool that supports file upload
+PUT {{api}}/{{productId}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+30
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="additional-image.jpg"
+Content-Type: image/jpeg
+
+< ./additional-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+### 13. CREATE PRODUCT WITH INVALID DATA (TEST VALIDATION)
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "category": "",
+  "price": -100,
+  "stock": -10,
+  "variants": [
+    {
+      "color": "red",  // Invalid hex code
+      "size": "XXL",   // Valid size
+      "price": -50     // Invalid price
+    }
+  ],
+  "imageUrls": []
+}
+
+### 14. CREATE PRODUCT WITH INVALID VARIANTS JSON
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Test Product",
+  "category": "Test",
+  "price": 1000,
+  "stock": 10,
+  "variants": "[invalid json",
+  "imageUrls": ["https://example.com/image.jpg"]
+}
+
+### 15. GET NON-EXISTENT PRODUCT
+GET {{api}}/507f1f77bcf86cd799439011
+
+### 16. UPDATE NON-EXISTENT PRODUCT
+PUT {{api}}/507f1f77bcf86cd799439011
+Content-Type: application/json
+
+{
+  "stock": 10
+}
+
+### 17. CREATE PRODUCT WITH MAX DISCOUNT
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Festival Special Offer",
+  "category": "Kurta",
+  "price": 1999,
+  "discount": 70,
+  "stock": 15,
+  "description": "Limited time festival offer on premium cotton kurta",
+  "variants": [
+    {
+      "color": "#FFFFFF",
+      "size": "M",
+      "price": 1999
+    }
+  ],
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1572804013309-59a88b7e92f1"
+  ]
+}
+
+### 18. CREATE PRODUCT - INACTIVE STATUS
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Out of Season Collection",
+  "category": "Winter Wear",
+  "price": 2499,
+  "discount": 20,
+  "stock": 0,
+  "status": "Inactive",
+  "description": "Winter collection - will be available next season",
+  "variants": [
+    {
+      "color": "#000000",
+      "size": "L",
+      "price": 2499
+    }
+  ],
+  "imageUrls": [
+    "https://images.unsplash.com/photo-1552374196-1ab2a1c593e8"
+  ]
+}
+
+### 19. TEST LARGE FILE UPLOAD (Should fail - 5MB limit)
+POST {{api}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+Test Large File
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+Test
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+100
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+10
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="large-file.jpg"
+Content-Type: image/jpeg
+
+< ./large-file-over-5mb.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+### 20. TEST INVALID FILE TYPE UPLOAD (Should fail - PDF not allowed)
+POST {{api}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+Test Invalid File
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+Test
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+100
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+10
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="document.pdf"
+Content-Type: application/pdf
+
+< ./document.pdf
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+
+### 21. CREATE PRODUCT WITH NO IMAGES (Should fail)
+POST {{api}}
+Content-Type: application/json
+
+{
+  "name": "Product Without Images",
+  "category": "Test",
+  "price": 1000,
+  "stock": 10,
+  "variants": [
+    {
+      "color": "#000000",
+      "size": "M",
+      "price": 1000
+    }
+  ],
+  "imageUrls": []
+}
+
+### 22. CREATE PRODUCT WITH MIXED IMAGE SOURCES (URLs + File upload)
+### Note: Requires tool that supports multipart with JSON
+POST {{api}}
+Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="name"
+
+Mixed Image Sources Product
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="category"
+
+Kurti
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="price"
+
+1299
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="stock"
+
+40
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="imageUrls"
+
+["https://images.unsplash.com/photo-1584917865442-de89df76afd3"]
+------WebKitFormBoundary7MA4YWxkTrZu0gW
+Content-Disposition: form-data; name="images"; filename="uploaded-image.jpg"
+Content-Type: image/jpeg
+
+< ./uploaded-image.jpg
+------WebKitFormBoundary7MA4YWxkTrZu0gW

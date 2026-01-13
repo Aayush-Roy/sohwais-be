@@ -1,0 +1,349 @@
+const Product = require('../models/Product');
+const configureCloudinary = require('../config/cloudinary');
+
+const cloudinary = configureCloudinary();
+
+// Helper function to process images
+const processImages = async (files, existingImages = []) => {
+  const images = [...existingImages];
+  
+  // Add uploaded files to images array
+  if (files && files.length > 0) {
+    const uploadedImages = files.map(file => ({
+      url: file.path,
+      public_id: file.filename
+    }));
+    images.push(...uploadedImages);
+  }
+  
+  return images;
+};
+
+// Helper function to process image URLs
+const processImageUrls = (imageUrls = []) => {
+  return imageUrls.map(url => {
+    // Extract public_id from Cloudinary URL if possible
+    // This is a simple extraction - adjust based on your needs
+    const publicIdMatch = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+    const public_id = publicIdMatch ? publicIdMatch[1] : `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    return {
+      url: url,
+      public_id: public_id
+    };
+  });
+};
+
+// Create a new product
+exports.createProduct = async (req, res) => {
+  try {
+    const {
+      name,
+      category,
+      price,
+      discount = 0,
+      stock,
+      status = 'Active',
+      description = '',
+      variants = [],
+      imageUrls = []
+    } = req.body;
+
+    // Parse variants if it's a string
+    let parsedVariants = variants;
+    if (typeof variants === 'string') {
+      try {
+        parsedVariants = JSON.parse(variants);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid variants format. Must be valid JSON array.'
+        });
+      }
+    }
+
+    // Process image URLs from request body
+    let parsedImageUrls = imageUrls;
+    if (typeof imageUrls === 'string') {
+      try {
+        parsedImageUrls = JSON.parse(imageUrls);
+      } catch (error) {
+        // If not JSON, treat as single URL string
+        parsedImageUrls = imageUrls ? [imageUrls] : [];
+      }
+    }
+
+    // Combine images from URLs and uploaded files
+    let images = [];
+    
+    // Add images from URLs
+    if (parsedImageUrls && parsedImageUrls.length > 0) {
+      const urlImages = processImageUrls(parsedImageUrls);
+      images.push(...urlImages);
+    }
+    
+    // Add uploaded images
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = await processImages(req.files);
+      images.push(...uploadedImages);
+    }
+
+    // Validate that we have at least one image
+    if (images.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'At least one image is required (URL or file upload)'
+      });
+    }
+
+    // Create product
+    const product = new Product({
+      name,
+      category,
+      price: Number(price),
+      discount: Number(discount),
+      stock: Number(stock),
+      status,
+      description,
+      variants: parsedVariants,
+      images
+    });
+
+    await product.save();
+
+    res.status(201).json({
+      success: true,
+      message: 'Product created successfully',
+      data: product
+    });
+  } catch (error) {
+    console.error('Create product error:', error);
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error creating product',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
+// Get all products
+exports.getAllProducts = async (req, res) => {
+  try {
+    const products = await Product.find()
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
+  } catch (error) {
+    console.error('Get all products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching products',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
+// Get single product by ID
+exports.getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id).select('-__v');
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: product
+    });
+  } catch (error) {
+    console.error('Get product by ID error:', error);
+    
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching product',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+
+// Update product
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+    
+    // Parse variants if it's a string
+    if (updateData.variants && typeof updateData.variants === 'string') {
+      try {
+        updateData.variants = JSON.parse(updateData.variants);
+      } catch (error) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid variants format. Must be valid JSON array.'
+        });
+      }
+    }
+
+    // Parse imageUrls if it's a string
+    if (updateData.imageUrls && typeof updateData.imageUrls === 'string') {
+      try {
+        updateData.imageUrls = JSON.parse(updateData.imageUrls);
+      } catch (error) {
+        // If not JSON, treat as single URL string
+        updateData.imageUrls = updateData.imageUrls ? [updateData.imageUrls] : [];
+      }
+    }
+
+    // Find existing product
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    // Handle new images
+    let images = [...existingProduct.images];
+    
+    // Add new images from URLs
+    if (updateData.imageUrls && updateData.imageUrls.length > 0) {
+      const urlImages = processImageUrls(updateData.imageUrls);
+      images.push(...urlImages);
+      delete updateData.imageUrls; // Remove from updateData as we've processed it
+    }
+    
+    // Add uploaded images
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = await processImages(req.files);
+      images.push(...uploadedImages);
+    }
+
+    // If we have new images, update the images array
+    if (images.length > existingProduct.images.length) {
+      updateData.images = images;
+    }
+
+    // Convert numeric fields
+    if (updateData.price) updateData.price = Number(updateData.price);
+    if (updateData.discount) updateData.discount = Number(updateData.discount);
+    if (updateData.stock) updateData.stock = Number(updateData.stock);
+
+    // Update product
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true, // Return the updated document
+        runValidators: true // Run model validators
+      }
+    ).select('-__v');
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      data: updatedProduct
+    });
+  } catch (error) {
+    console.error('Update product error:', error);
+    
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors
+      });
+    }
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error updating product',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
+// Add this function to product.controller.js
+
+// Delete product
+exports.deleteProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const product = await Product.findById(id);
+
+    if (!product) {
+      return res.status(404).json({
+        success: false,
+        message: 'Product not found'
+      });
+    }
+
+    // Delete images from Cloudinary
+    const cloudinary = configureCloudinary();
+    for (const image of product.images) {
+      if (image.public_id && image.public_id.startsWith('traditional-clothing/')) {
+        await cloudinary.uploader.destroy(image.public_id);
+      }
+    }
+
+    await Product.findByIdAndDelete(id);
+
+    res.status(200).json({
+      success: true,
+      message: 'Product deleted successfully'
+    });
+  } catch (error) {
+    console.error('Delete product error:', error);
+    
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error deleting product',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+    });
+  }
+};
