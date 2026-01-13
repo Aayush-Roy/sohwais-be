@@ -158,7 +158,7 @@ exports.getAllProducts = async (req, res) => {
     });
   }
 };
-
+//just adding comment for testing
 // Get single product by ID
 exports.getProductById = async (req, res) => {
   try {
