@@ -1,4 +1,5 @@
-@baseUrl = http://localhost:5000
+@baseUrl = https://sohwais-be.onrender.com
+# http://localhost:5000
 @api = {{baseUrl}}/api/products
 
 ### 1. HEALTH CHECK
