@@ -1,3 +1,352 @@
+// const Product = require('../models/Product');
+// const configureCloudinary = require('../config/cloudinary');
+
+// const cloudinary = configureCloudinary();
+
+// // Helper function to process images
+// const processImages = async (files, existingImages = []) => {
+//   const images = [...existingImages];
+  
+//   // Add uploaded files to images array
+//   if (files && files.length > 0) {
+//     const uploadedImages = files.map(file => ({
+//       url: file.path,
+//       public_id: file.filename
+//     }));
+//     images.push(...uploadedImages);
+//   }
+  
+//   return images;
+// };
+
+// // Helper function to process image URLs
+// const processImageUrls = (imageUrls = []) => {
+//   return imageUrls.map(url => {
+//     // Extract public_id from Cloudinary URL if possible
+//     // This is a simple extraction - adjust based on your needs
+//     const publicIdMatch = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
+//     const public_id = publicIdMatch ? publicIdMatch[1] : `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+//     return {
+//       url: url,
+//       public_id: public_id
+//     };
+//   });
+// };
+
+// // Create a new product
+// exports.createProduct = async (req, res) => {
+//   try {
+//     const {
+//       name,
+//       category,
+//       price,
+//       discount = 0,
+//       stock,
+//       status = 'Active',
+//       description = '',
+//       variants = [],
+//       imageUrls = []
+//     } = req.body;
+
+//     // Parse variants if it's a string
+//     let parsedVariants = variants;
+//     if (typeof variants === 'string') {
+//       try {
+//         parsedVariants = JSON.parse(variants);
+//       } catch (error) {
+//         return res.status(400).json({
+//           success: false,
+//           message: 'Invalid variants format. Must be valid JSON array.'
+//         });
+//       }
+//     }
+
+//     // Process image URLs from request body
+//     let parsedImageUrls = imageUrls;
+//     if (typeof imageUrls === 'string') {
+//       try {
+//         parsedImageUrls = JSON.parse(imageUrls);
+//       } catch (error) {
+//         // If not JSON, treat as single URL string
+//         parsedImageUrls = imageUrls ? [imageUrls] : [];
+//       }
+//     }
+
+//     // Combine images from URLs and uploaded files
+//     let images = [];
+    
+//     // Add images from URLs
+//     if (parsedImageUrls && parsedImageUrls.length > 0) {
+//       const urlImages = processImageUrls(parsedImageUrls);
+//       images.push(...urlImages);
+//     }
+    
+//     // Add uploaded images
+//     if (req.files && req.files.length > 0) {
+//       const uploadedImages = await processImages(req.files);
+//       images.push(...uploadedImages);
+//     }
+
+//     // Validate that we have at least one image
+//     if (images.length === 0) {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'At least one image is required (URL or file upload)'
+//       });
+//     }
+
+//     // Create product
+//     const product = new Product({
+//       name,
+//       category,
+//       price: Number(price),
+//       discount: Number(discount),
+//       stock: Number(stock),
+//       status,
+//       description,
+//       variants: parsedVariants,
+//       images
+//     });
+
+//     await product.save();
+
+//     res.status(201).json({
+//       success: true,
+//       message: 'Product created successfully',
+//       data: product
+//     });
+//   } catch (error) {
+//     console.error('Create product error:', error);
+    
+//     // Handle validation errors
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(err => err.message);
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Validation error',
+//         errors
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error creating product',
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+
+// // Get all products
+// exports.getAllProducts = async (req, res) => {
+//   try {
+//     const products = await Product.find()
+//       .sort({ createdAt: -1 })
+//       .select('-__v');
+
+//     res.status(200).json({
+//       success: true,
+//       count: products.length,
+//       data: products
+//     });
+//   } catch (error) {
+//     console.error('Get all products error:', error);
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error fetching products',
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+// //just adding comment for testing
+// // Get single product by ID
+// exports.getProductById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const product = await Product.findById(id).select('-__v');
+
+//     if (!product) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product not found'
+//       });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       data: product
+//     });
+//   } catch (error) {
+//     console.error('Get product by ID error:', error);
+    
+//     if (error.name === 'CastError') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid product ID'
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error fetching product',
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+
+// // Update product
+// exports.updateProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const updateData = { ...req.body };
+    
+//     // Parse variants if it's a string
+//     if (updateData.variants && typeof updateData.variants === 'string') {
+//       try {
+//         updateData.variants = JSON.parse(updateData.variants);
+//       } catch (error) {
+//         return res.status(400).json({
+//           success: false,
+//           message: 'Invalid variants format. Must be valid JSON array.'
+//         });
+//       }
+//     }
+
+//     // Parse imageUrls if it's a string
+//     if (updateData.imageUrls && typeof updateData.imageUrls === 'string') {
+//       try {
+//         updateData.imageUrls = JSON.parse(updateData.imageUrls);
+//       } catch (error) {
+//         // If not JSON, treat as single URL string
+//         updateData.imageUrls = updateData.imageUrls ? [updateData.imageUrls] : [];
+//       }
+//     }
+
+//     // Find existing product
+//     const existingProduct = await Product.findById(id);
+//     if (!existingProduct) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product not found'
+//       });
+//     }
+
+//     // Handle new images
+//     let images = [...existingProduct.images];
+    
+//     // Add new images from URLs
+//     if (updateData.imageUrls && updateData.imageUrls.length > 0) {
+//       const urlImages = processImageUrls(updateData.imageUrls);
+//       images.push(...urlImages);
+//       delete updateData.imageUrls; // Remove from updateData as we've processed it
+//     }
+    
+//     // Add uploaded images
+//     if (req.files && req.files.length > 0) {
+//       const uploadedImages = await processImages(req.files);
+//       images.push(...uploadedImages);
+//     }
+
+//     // If we have new images, update the images array
+//     if (images.length > existingProduct.images.length) {
+//       updateData.images = images;
+//     }
+
+//     // Convert numeric fields
+//     if (updateData.price) updateData.price = Number(updateData.price);
+//     if (updateData.discount) updateData.discount = Number(updateData.discount);
+//     if (updateData.stock) updateData.stock = Number(updateData.stock);
+
+//     // Update product
+//     const updatedProduct = await Product.findByIdAndUpdate(
+//       id,
+//       updateData,
+//       {
+//         new: true, // Return the updated document
+//         runValidators: true // Run model validators
+//       }
+//     ).select('-__v');
+
+//     res.status(200).json({
+//       success: true,
+//       message: 'Product updated successfully',
+//       data: updatedProduct
+//     });
+//   } catch (error) {
+//     console.error('Update product error:', error);
+    
+//     // Handle validation errors
+//     if (error.name === 'ValidationError') {
+//       const errors = Object.values(error.errors).map(err => err.message);
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Validation error',
+//         errors
+//       });
+//     }
+
+//     if (error.name === 'CastError') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid product ID'
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error updating product',
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
+// // Add this function to product.controller.js
+
+// // Delete product
+// exports.deleteProduct = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+
+//     const product = await Product.findById(id);
+
+//     if (!product) {
+//       return res.status(404).json({
+//         success: false,
+//         message: 'Product not found'
+//       });
+//     }
+
+//     // Delete images from Cloudinary
+//     const cloudinary = configureCloudinary();
+//     for (const image of product.images) {
+//       if (image.public_id && image.public_id.startsWith('traditional-clothing/')) {
+//         await cloudinary.uploader.destroy(image.public_id);
+//       }
+//     }
+
+//     await Product.findByIdAndDelete(id);
+
+//     res.status(200).json({
+//       success: true,
+//       message: 'Product deleted successfully'
+//     });
+//   } catch (error) {
+//     console.error('Delete product error:', error);
+    
+//     if (error.name === 'CastError') {
+//       return res.status(400).json({
+//         success: false,
+//         message: 'Invalid product ID'
+//       });
+//     }
+
+//     res.status(500).json({
+//       success: false,
+//       message: 'Error deleting product',
+//       error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+//     });
+//   }
+// };
 const Product = require('../models/Product');
 const configureCloudinary = require('../config/cloudinary');
 
@@ -11,7 +360,8 @@ const processImages = async (files, existingImages = []) => {
   if (files && files.length > 0) {
     const uploadedImages = files.map(file => ({
       url: file.path,
-      public_id: file.filename
+      public_id: file.filename,
+      isPrimary: images.length === 0 // First image is primary
     }));
     images.push(...uploadedImages);
   }
@@ -21,17 +371,68 @@ const processImages = async (files, existingImages = []) => {
 
 // Helper function to process image URLs
 const processImageUrls = (imageUrls = []) => {
-  return imageUrls.map(url => {
-    // Extract public_id from Cloudinary URL if possible
-    // This is a simple extraction - adjust based on your needs
+  return imageUrls.map((url, index) => {
     const publicIdMatch = url.match(/upload\/(?:v\d+\/)?([^\.]+)/);
     const public_id = publicIdMatch ? publicIdMatch[1] : `manual_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     
     return {
       url: url,
-      public_id: public_id
+      public_id: public_id,
+      isPrimary: index === 0 // First URL image is primary
     };
   });
+};
+
+// Get all available collections
+exports.getCollections = async (req, res) => {
+  try {
+    const collections = [
+      'Madhubani Collection',
+      'Sujini Collection', 
+      'Marble Collection',
+      'Nakashi Collection',
+      'Majestic Linen',
+      'The Batik Archive',
+      'Traditional',
+      'Modern',
+      'Festival Special',
+      'Wedding Collection',
+      'Daily Wear'
+    ];
+    
+    res.status(200).json({
+      success: true,
+      data: collections
+    });
+  } catch (error) {
+    console.error('Get collections error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching collections'
+    });
+  }
+};
+
+// Get categories and sub-categories
+exports.getCategories = async (req, res) => {
+  try {
+    const categories = {
+      Men: ['Kurta', 'Sherwani', 'Dhoti', 'Pajama', 'Jacket', 'Shawl', 'Turban'],
+      Women: ['Saree', 'Lehenga', 'Salwar Suit', 'Kurti', 'Dupatta', 'Blouse', 'Ghagra'],
+      Unisex: ['Stole', 'Scarf', 'Bag', 'Jewelry', 'Footwear', 'Accessories']
+    };
+    
+    res.status(200).json({
+      success: true,
+      data: categories
+    });
+  } catch (error) {
+    console.error('Get categories error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching categories'
+    });
+  }
 };
 
 // Create a new product
@@ -40,44 +441,43 @@ exports.createProduct = async (req, res) => {
     const {
       name,
       category,
+      collection,
+      subCategory,
       price,
       discount = 0,
       stock,
       status = 'Active',
       description = '',
+      features = [],
       variants = [],
+      tags = [],
       imageUrls = []
     } = req.body;
 
-    // Parse variants if it's a string
-    let parsedVariants = variants;
-    if (typeof variants === 'string') {
-      try {
-        parsedVariants = JSON.parse(variants);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid variants format. Must be valid JSON array.'
-        });
+    // Parse arrays if they are strings
+    const parseArray = (data) => {
+      if (!data) return [];
+      if (Array.isArray(data)) return data;
+      if (typeof data === 'string') {
+        try {
+          return JSON.parse(data);
+        } catch {
+          return [data];
+        }
       }
-    }
+      return [];
+    };
 
-    // Process image URLs from request body
-    let parsedImageUrls = imageUrls;
-    if (typeof imageUrls === 'string') {
-      try {
-        parsedImageUrls = JSON.parse(imageUrls);
-      } catch (error) {
-        // If not JSON, treat as single URL string
-        parsedImageUrls = imageUrls ? [imageUrls] : [];
-      }
-    }
+    let parsedVariants = parseArray(variants);
+    let parsedImageUrls = parseArray(imageUrls);
+    let parsedFeatures = parseArray(features);
+    let parsedTags = parseArray(tags);
 
     // Combine images from URLs and uploaded files
     let images = [];
     
     // Add images from URLs
-    if (parsedImageUrls && parsedImageUrls.length > 0) {
+    if (parsedImageUrls.length > 0) {
       const urlImages = processImageUrls(parsedImageUrls);
       images.push(...urlImages);
     }
@@ -96,16 +496,25 @@ exports.createProduct = async (req, res) => {
       });
     }
 
+    // Ensure at least one image is primary
+    if (!images.some(img => img.isPrimary)) {
+      images[0].isPrimary = true;
+    }
+
     // Create product
     const product = new Product({
       name,
       category,
+      collection,
+      subCategory,
       price: Number(price),
       discount: Number(discount),
       stock: Number(stock),
       status,
       description,
+      features: parsedFeatures,
       variants: parsedVariants,
+      tags: parsedTags,
       images
     });
 
@@ -119,7 +528,6 @@ exports.createProduct = async (req, res) => {
   } catch (error) {
     console.error('Create product error:', error);
     
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -137,16 +545,67 @@ exports.createProduct = async (req, res) => {
   }
 };
 
-// Get all products
+// Get all products with filters
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find()
-      .sort({ createdAt: -1 })
+    const { 
+      category, 
+      collection, 
+      subCategory, 
+      status, 
+      minPrice, 
+      maxPrice,
+      tags,
+      sortBy = 'createdAt',
+      sortOrder = 'desc',
+      page = 1,
+      limit = 20
+    } = req.query;
+
+    // Build filter object
+    const filter = {};
+    
+    if (category) filter.category = category;
+    if (collection) filter.collection = collection;
+    if (subCategory) filter.subCategory = subCategory;
+    if (status) filter.status = status;
+    
+    // Price range filter
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+    
+    // Tags filter
+    if (tags) {
+      const tagsArray = Array.isArray(tags) ? tags : [tags];
+      filter.tags = { $in: tagsArray };
+    }
+
+    // Calculate pagination
+    const skip = (page - 1) * limit;
+    
+    // Build sort object
+    const sort = {};
+    sort[sortBy] = sortOrder === 'desc' ? -1 : 1;
+
+    // Execute query
+    const products = await Product.find(filter)
+      .sort(sort)
+      .skip(skip)
+      .limit(Number(limit))
       .select('-__v');
+
+    // Get total count for pagination
+    const total = await Product.countDocuments(filter);
 
     res.status(200).json({
       success: true,
       count: products.length,
+      total,
+      pages: Math.ceil(total / limit),
+      currentPage: Number(page),
       data: products
     });
   } catch (error) {
@@ -158,7 +617,65 @@ exports.getAllProducts = async (req, res) => {
     });
   }
 };
-//just adding comment for testing
+
+// Get products by category
+exports.getProductsByCategory = async (req, res) => {
+  try {
+    const { category } = req.params;
+    const { collection, subCategory } = req.query;
+
+    const filter = { category, status: 'Active' };
+    if (collection) filter.collection = collection;
+    if (subCategory) filter.subCategory = subCategory;
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    res.status(200).json({
+      success: true,
+      category,
+      count: products.length,
+      data: products
+    });
+  } catch (error) {
+    console.error('Get products by category error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching products by category'
+    });
+  }
+};
+
+// Get products by collection
+exports.getProductsByCollection = async (req, res) => {
+  try {
+    const { collection } = req.params;
+    const { category, subCategory } = req.query;
+    console.log(collection);
+    const filter = { collection, status: 'Active' };
+    if (category) filter.category = category;
+    if (subCategory) filter.subCategory = subCategory;
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    res.status(200).json({
+      success: true,
+      collection,
+      count: products.length,
+      data: products
+    });
+  } catch (error) {
+    console.error('Get products by collection error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching products by collection'
+    });
+  }
+};
+
 // Get single product by ID
 exports.getProductById = async (req, res) => {
   try {
@@ -189,8 +706,7 @@ exports.getProductById = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Error fetching product',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: 'Error fetching product'
     });
   }
 };
@@ -200,27 +716,32 @@ exports.updateProduct = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = { ...req.body };
-    
-    // Parse variants if it's a string
-    if (updateData.variants && typeof updateData.variants === 'string') {
-      try {
-        updateData.variants = JSON.parse(updateData.variants);
-      } catch (error) {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid variants format. Must be valid JSON array.'
-        });
-      }
-    }
 
-    // Parse imageUrls if it's a string
-    if (updateData.imageUrls && typeof updateData.imageUrls === 'string') {
-      try {
-        updateData.imageUrls = JSON.parse(updateData.imageUrls);
-      } catch (error) {
-        // If not JSON, treat as single URL string
-        updateData.imageUrls = updateData.imageUrls ? [updateData.imageUrls] : [];
+    // Parse arrays if they are strings
+    const parseArray = (data) => {
+      if (!data) return undefined;
+      if (Array.isArray(data)) return data;
+      if (typeof data === 'string') {
+        try {
+          return JSON.parse(data);
+        } catch {
+          return [data];
+        }
       }
+      return undefined;
+    };
+
+    if (updateData.variants) {
+      updateData.variants = parseArray(updateData.variants);
+    }
+    if (updateData.imageUrls) {
+      updateData.imageUrls = parseArray(updateData.imageUrls);
+    }
+    if (updateData.features) {
+      updateData.features = parseArray(updateData.features);
+    }
+    if (updateData.tags) {
+      updateData.tags = parseArray(updateData.tags);
     }
 
     // Find existing product
@@ -239,7 +760,7 @@ exports.updateProduct = async (req, res) => {
     if (updateData.imageUrls && updateData.imageUrls.length > 0) {
       const urlImages = processImageUrls(updateData.imageUrls);
       images.push(...urlImages);
-      delete updateData.imageUrls; // Remove from updateData as we've processed it
+      delete updateData.imageUrls;
     }
     
     // Add uploaded images
@@ -249,7 +770,8 @@ exports.updateProduct = async (req, res) => {
     }
 
     // If we have new images, update the images array
-    if (images.length > existingProduct.images.length) {
+    if (images.length !== existingProduct.images.length || 
+        JSON.stringify(images) !== JSON.stringify(existingProduct.images)) {
       updateData.images = images;
     }
 
@@ -257,14 +779,16 @@ exports.updateProduct = async (req, res) => {
     if (updateData.price) updateData.price = Number(updateData.price);
     if (updateData.discount) updateData.discount = Number(updateData.discount);
     if (updateData.stock) updateData.stock = Number(updateData.stock);
+    if (updateData.rating) updateData.rating = Number(updateData.rating);
+    if (updateData.reviewsCount) updateData.reviewsCount = Number(updateData.reviewsCount);
 
     // Update product
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       updateData,
       {
-        new: true, // Return the updated document
-        runValidators: true // Run model validators
+        new: true,
+        runValidators: true
       }
     ).select('-__v');
 
@@ -276,7 +800,6 @@ exports.updateProduct = async (req, res) => {
   } catch (error) {
     console.error('Update product error:', error);
     
-    // Handle validation errors
     if (error.name === 'ValidationError') {
       const errors = Object.values(error.errors).map(err => err.message);
       return res.status(400).json({
@@ -295,12 +818,10 @@ exports.updateProduct = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Error updating product',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: 'Error updating product'
     });
   }
 };
-// Add this function to product.controller.js
 
 // Delete product
 exports.deleteProduct = async (req, res) => {
@@ -317,7 +838,6 @@ exports.deleteProduct = async (req, res) => {
     }
 
     // Delete images from Cloudinary
-    const cloudinary = configureCloudinary();
     for (const image of product.images) {
       if (image.public_id && image.public_id.startsWith('traditional-clothing/')) {
         await cloudinary.uploader.destroy(image.public_id);
@@ -342,8 +862,76 @@ exports.deleteProduct = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      message: 'Error deleting product',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: 'Error deleting product'
+    });
+  }
+};
+
+// Get featured products
+exports.getFeaturedProducts = async (req, res) => {
+  try {
+    const products = await Product.find({ 
+      status: 'Active',
+      discount: { $gt: 0 } // Products with discount
+    })
+    .sort({ discount: -1, createdAt: -1 })
+    .limit(10)
+    .select('-__v');
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
+  } catch (error) {
+    console.error('Get featured products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching featured products'
+    });
+  }
+};
+
+// Search products
+exports.searchProducts = async (req, res) => {
+  try {
+    const { q, category, collection, minPrice, maxPrice } = req.query;
+
+    const filter = { status: 'Active' };
+    
+    // Text search
+    if (q) {
+      filter.$or = [
+        { name: { $regex: q, $options: 'i' } },
+        { description: { $regex: q, $options: 'i' } },
+        { tags: { $regex: q, $options: 'i' } }
+      ];
+    }
+    
+    if (category) filter.category = category;
+    if (collection) filter.collection = collection;
+    
+    // Price range
+    if (minPrice || maxPrice) {
+      filter.price = {};
+      if (minPrice) filter.price.$gte = Number(minPrice);
+      if (maxPrice) filter.price.$lte = Number(maxPrice);
+    }
+
+    const products = await Product.find(filter)
+      .sort({ createdAt: -1 })
+      .select('-__v');
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      data: products
+    });
+  } catch (error) {
+    console.error('Search products error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error searching products'
     });
   }
 };

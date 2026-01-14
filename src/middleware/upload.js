@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024, // 5MB limit
+    fileSize: 10 * 1024 * 1024, // 5MB limit
     files: 5 // Maximum 5 files
   },
   fileFilter: (req, file, cb) => {
@@ -35,7 +35,7 @@ const upload = multer({
 });
 
 // Middleware to handle multiple image uploads
-const uploadProductImages = upload.array('images', 5);
+const uploadProductImages = upload.array('images', 10);
 
 // Middleware to handle single image upload (if needed)
 const uploadSingleImage = upload.single('image');
