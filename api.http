@@ -809,3 +809,60 @@ Content-Type: application/json
     "https://images.unsplash.com/photo-1582418702059-97ebafb35d09"
   ]
 }
+
+
+//razorpay
+### 1. HEALTH CHECK
+GET http://localhost:5000/health
+
+### 2. API DOCS
+GET http://localhost:5000/api
+
+### 3. CREATE ORDER
+POST http://localhost:5000/api/orders/create-order
+Content-Type: application/json
+
+{
+  "items": [
+    {
+      "productId": "1234567890abcdef12345678",
+      "name": "Madhubani Printed Silk Kurta",
+      "price": 2999,
+      "discount": 10,
+      "finalPrice": 2699,
+      "quantity": 2,
+      "size": "M",
+      "color": "#FF0000",
+      "image": "https://example.com/image.jpg"
+    }
+  ],
+  "customer": {
+    "name": "John Doe",
+    "email": "john@example.com",
+    "mobile": "9876543210"
+  },
+  "shippingAddress": {
+    "addressLine1": "123 Main Street",
+    "addressLine2": "Near City Center",
+    "city": "Mumbai",
+    "state": "Maharashtra",
+    "pincode": "400001",
+    "country": "India"
+  },
+  "subtotal": 5398,
+  "shippingCharge": 0,
+  "tax": 972,
+  "discount": 300,
+  "totalAmount": 6070
+}
+
+### 4. VERIFY PAYMENT
+POST http://localhost:5000/api/orders/verify-payment
+Content-Type: application/json
+
+{
+  "razorpay_order_id": "order_NLqI5mTDxSqXrK",
+  "razorpay_payment_id": "pay_NLqI7Q1Qd6XrK",
+  "razorpay_signature": "signature_here",
+  "orderId": "SO1234567890"
+}

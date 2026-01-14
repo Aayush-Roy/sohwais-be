@@ -130,8 +130,8 @@ const PORT = process.env.PORT || 5000;
 app.use((req, res, next) => {
   // List of allowed origins
   const allowedOrigins = [
-    'http://localhost:3000',
-    'http://localhost:3001',
+    'https://wild-be.vercel.app',
+    'https://sohwaisdash.vercel.app',
     'http://localhost:5173',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001'
@@ -183,15 +183,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-const findOrders = async()=>{
-  try{
-    const res = await Order.find({});
-    console.log(res);
-  }catch(err){
-    console.log(err);
-  }
-}
-findOrders();
+
 
 // 404 handler
 app.use((req, res) => {
