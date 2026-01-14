@@ -119,7 +119,8 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 
 const productRoutes = require('./routes/product.routes');
-
+const orderRoutes = require('./routes/order.routes');
+const Order = require('./models/Order');
 const app = express();
 const PORT = process.env.PORT || 5000;
 
@@ -163,7 +164,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/products', productRoutes);
-
+app.use('/api/orders', orderRoutes);
 // Health check with CORS test
 app.get('/health', (req, res) => {
   console.log('Health check from origin:', req.headers.origin);
@@ -181,6 +182,16 @@ app.get('/health', (req, res) => {
     ]
   });
 });
+
+const findOrders = async()=>{
+  try{
+    const res = await Order.find({});
+    console.log(res);
+  }catch(err){
+    console.log(err);
+  }
+}
+findOrders();
 
 // 404 handler
 app.use((req, res) => {

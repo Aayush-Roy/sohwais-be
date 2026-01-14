@@ -131,10 +131,13 @@ const cors = require('cors');
 const mongoose = require('mongoose');
 
 const productRoutes = require('./routes/product.routes');
+const orderRoutes = require('./routes/order.routes');
 
 const app = express();
 
 const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
  'https://wild-be.vercel.app',
   'https://sohwaisdash.vercel.app'
 ];
@@ -171,6 +174,7 @@ if (mongoose.connection.readyState === 0) {
 }
 
 app.use('/api/products', productRoutes);
+app.use('/api/orders',orderRoutes);
 
 app.get('/health', (req, res) => {
   res.json({ status: 'UP' });
