@@ -130,11 +130,12 @@ const PORT = process.env.PORT || 5000;
 app.use((req, res, next) => {
   // List of allowed origins
   const allowedOrigins = [
+    'https://sohwais.com',
     'https://wild-be.vercel.app',
     'https://sohwaisdash.vercel.app',
     'https://springgreen-grouse-139779.hostingersite.com',
     'http://localhost:5173',
-    'http://127.0.0.1:3000',
+    'http://localhost:3000',
     'http://127.0.0.1:3001'
   ];
   
