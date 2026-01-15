@@ -132,7 +132,7 @@ app.use((req, res, next) => {
   const allowedOrigins = [
     'https://wild-be.vercel.app',
     'https://sohwaisdash.vercel.app',
-    'https://springgreen-grouse-139779.hostingersite.com/',
+    'https://springgreen-grouse-139779.hostingersite.com',
     'http://localhost:5173',
     'http://127.0.0.1:3000',
     'http://127.0.0.1:3001'
