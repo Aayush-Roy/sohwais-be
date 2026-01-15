@@ -141,6 +141,7 @@ const allowedOrigins = [
  'https://wild-be.vercel.app',
   'https://sohwaisdash.vercel.app',
   'https://springgreen-grouse-139779.hostingersite.com',
+  'https://sohwais.com',
 ];
 // const allowedOrigins = [
 //   'http://localhost:3000',

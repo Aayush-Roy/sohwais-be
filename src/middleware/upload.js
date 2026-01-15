@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
 const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 40 * 1024 * 1024, // 5MB limit
+    fileSize: 40 * 1024 * 1024, // 40MB limit
     files: 5 // Maximum 5 files
   },
   fileFilter: (req, file, cb) => {
