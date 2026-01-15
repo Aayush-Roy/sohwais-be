@@ -131,7 +131,7 @@ app.use((req, res, next) => {
   // List of allowed origins
   const allowedOrigins = [
     'https://sohwais.com',
-    'https:www.sohwais.com',
+    'https://www.sohwais.com',
     'https://wild-be.vercel.app',
     'https://sohwaisdash.vercel.app',
     'https://springgreen-grouse-139779.hostingersite.com',
