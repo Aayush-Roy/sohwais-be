@@ -228,7 +228,7 @@ const variantSchema = new mongoose.Schema({
   },
   size: {
     type: String,
-    enum: ['S', 'M', 'L', 'XL', 'XXL'],
+    enum: ['S', 'M', 'L', 'XL', 'XXL','XS'],
     required: [true, 'Variant size is required']
   },
   price: {
