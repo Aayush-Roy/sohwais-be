@@ -23,5 +23,7 @@ const configureCloudinary = () => {
   
   return cloudinary;
 };
+  const cloudinary2 = configureCloudinary();
+console.log('Cloudinary config:', cloudinary2.config());
 
 module.exports = configureCloudinary;
