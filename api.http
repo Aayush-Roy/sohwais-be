@@ -409,8 +409,6 @@
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
 @baseUrl = https://api.sohwais.com
-
-https://api.sohwais.com
  https://sohwais-be.onrender.com
 #  
 @api = {{baseUrl}}/api/products
