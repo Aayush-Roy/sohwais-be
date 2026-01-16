@@ -44,7 +44,7 @@
 //   uploadProductImages,
 //   uploadSingleImage
 // };
-
+//just checkinh
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const configureCloudinary = require('../config/cloudinary');
