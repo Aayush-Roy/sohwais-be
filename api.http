@@ -408,9 +408,9 @@
 
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
-@baseUrl = http://localhost:5000
+@baseUrl = https://api.sohwais.com
  https://sohwais-be.onrender.com
-# http://localhost:5000
+# http://localhost:5000 
 @api = {{baseUrl}}/api/products
 
 ### 1. HEALTH CHECK
@@ -586,7 +586,7 @@ Content-Type: application/json
 
 ### 8. GET ALL PRODUCTS WITH FILTERS
 GET {{api}}?category=Men&collection=Majestic+Linen&sortBy=price&sortOrder=asc
-
+    
 ### 9. GET PRODUCTS BY CATEGORY (MEN)
 GET {{api}}/category/Men
 
