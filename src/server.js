@@ -139,8 +139,7 @@ app.use((req, res, next) => {
     'http://localhost:3000',
     'http://127.0.0.1:3001'
   ];
-  const cloudinary = configureCloudinary();
-console.log('Cloudinary config:', cloudinary.config());
+
   const origin = req.headers.origin;
   
   // If origin is in allowed list, set it dynamically

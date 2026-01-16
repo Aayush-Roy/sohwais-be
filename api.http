@@ -409,8 +409,10 @@
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
 @baseUrl = https://api.sohwais.com
+
+https://api.sohwais.com
  https://sohwais-be.onrender.com
-# http://localhost:5000 
+#  
 @api = {{baseUrl}}/api/products
 
 ### 1. HEALTH CHECK
