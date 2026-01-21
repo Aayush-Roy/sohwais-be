@@ -408,7 +408,7 @@
 
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
-@baseUrl = https://sohwais-be.onrender.com
+@baseUrl = https://api.sohwais.com
 
 # https://api.sohwais.com
  
@@ -472,36 +472,64 @@ Content-Type: application/json
 ### 5. CREATE WOMEN'S WEAR PRODUCT - SUJINI COLLECTION
 POST {{api}}
 Content-Type: application/json
-
 {
-  "name": "Sujini Embroidered Saree",
+  "name": "Blue Iris Embroidered Tunic",
   "category": "Women",
-  "collection": "Sujini Collection",
-  "subCategory": "Saree",
-  "price": 5999,
-  "discount": 20,
-  "stock": 15,
-  "description": "Hand-embroidered Sujini work saree with intricate thread work. Perfect for special occasions.",
+  "collection": "Summer Collection",
+  "subCategory": "Tunic",
+  "price": 2199,
+  "discount": 0,
+  "stock": 5,
+  "description": "A refreshing sky-blue shirt-style tunic featuring delicate iris-inspired floral embroidery on the chest and a cinched, gathered waist for a structured yet airy fit.",
   "features": [
-    "Hand Embroidery",
-    "Sujini Traditional Work",
-    "Pure Cotton",
-    "Zari Border",
-    "Running Blouse Piece"
+    "Shirt-Style Design",
+    "Floral Chest Embroidery",
+    "Cinched & Gathered Waist",
+    "Lightweight & Breathable Fabric",
+    "Comfortable Summer Wear"
   ],
-  "tags": ["Sujini", "Embroidered", "Saree", "Traditional", "Handmade"],
+  "tags": [
+    "Tunic",
+    "Embroidered",
+    "Floral",
+    "Summer Wear",
+    "Blue Iris",
+    "Shirt Style"
+  ],
   "variants": [
     {
-      "color": "#6A0572",
+      "color": "#5DADE2",
+      "size": "XS",
+      "price": 2199
+    },
+    {
+      "color": "#5DADE2",
+      "size": "S",
+      "price": 2199
+    },
+    {
+      "color": "#5DADE2",
+      "size": "M",
+      "price": 2199
+    },
+    {
+      "color": "#5DADE2",
+      "size": "L",
+      "price": 2199
+    },
+    {
+      "color": "#5DADE2",
       "size": "XL",
-      "price": 5999
+      "price": 2199
     }
   ],
   "imageUrls": [
-    "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9",
-    "https://images.unsplash.com/photo-1568259550238-762d5f3d8e7f"
+    "https://res.cloudinary.com/dwp3doiep/image/upload/v1768579164/Blue_irish_3_ffzrmi.jpg",
+    "https://res.cloudinary.com/dwp3doiep/image/upload/v1768579167/Blue_irish_2_oil9yv.jpg",
+    "https://res.cloudinary.com/dwp3doiep/image/upload/v1768579164/Blue_irish_3_ffzrmi.jpg"
   ]
 }
+
 
 ### 6. CREATE MAJESTIC LINEN COLLECTION PRODUCT
 POST {{api}}
@@ -590,7 +618,7 @@ Content-Type: application/json
 GET {{api}}?category=Men&collection=Majestic+Linen&sortBy=price&sortOrder=asc
     
 ### 9. GET PRODUCTS BY CATEGORY (MEN)
-GET {{api}}/category/Men
+GET {{api}}/category/Women
 
 ### 10. GET PRODUCTS BY COLLECTION
 GET {{api}}/collection/Madhubani Collection
