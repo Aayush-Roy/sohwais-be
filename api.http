@@ -408,7 +408,8 @@
 
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
-@baseUrl = https://api.sohwais.com
+@baseUrl = http://localhost:5000 
+# https://api.sohwais.com
 
 # https://api.sohwais.com
  
@@ -432,7 +433,7 @@ Content-Type: application/json
   "name": "Madhubani Printed Silk Kurta",
   "category": "Men",
   "collection": "Madhubani Collection",
-  "subCategory": "Kurta",
+  "subCategory": "Half Sleeve Shirt",
   "price": 3499,
   "discount": 15,
   "stock": 25,
