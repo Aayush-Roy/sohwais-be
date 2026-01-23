@@ -129,20 +129,29 @@
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
-
-const productRoutes = require('./routes/product.routes');
-const orderRoutes = require('./routes/order.routes');
-
-const app = express();
-
 const allowedOrigins = [
   'http://localhost:3000',
+  'http://localhost:3001',
   'http://localhost:5173',
  'https://wild-be.vercel.app',
   'https://sohwaisdash.vercel.app',
   'https://springgreen-grouse-139779.hostingersite.com',
   'https://sohwais.com',
 ];
+const productRoutes = require('./routes/product.routes');
+const orderRoutes = require('./routes/order.routes');
+
+const app = express();
+
+// const allowedOrigins = [
+//   'http://localhost:3000',
+//   'http://localhost:3001',
+//   'http://localhost:5173',
+//  'https://wild-be.vercel.app',
+//   'https://sohwaisdash.vercel.app',
+//   'https://springgreen-grouse-139779.hostingersite.com',
+//   'https://sohwais.com',
+// ];
 // const allowedOrigins = [
 //   'http://localhost:3000',
 //   'http://localhost:3001',

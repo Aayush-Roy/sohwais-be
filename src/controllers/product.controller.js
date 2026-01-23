@@ -421,116 +421,261 @@
   };
 
   // Update product
-  exports.updateProduct = async (req, res) => {
-    try {
-      const { id } = req.params;
-      const updateData = { ...req.body };
+  // exports.updateProduct = async (req, res) => {
+  //   try {
+  //     const { id } = req.params;
+  //     const updateData = { ...req.body };
 
-      // Parse arrays if they are strings
-      const parseArray = (data) => {
-        if (!data) return undefined;
-        if (Array.isArray(data)) return data;
-        if (typeof data === 'string') {
-          try {
-            return JSON.parse(data);
-          } catch {
-            return [data];
-          }
+  //     // Parse arrays if they are strings
+  //     const parseArray = (data) => {
+  //       if (!data) return undefined;
+  //       if (Array.isArray(data)) return data;
+  //       if (typeof data === 'string') {
+  //         try {
+  //           return JSON.parse(data);
+  //         } catch {
+  //           return [data];
+  //         }
+  //       }
+  //       return undefined;
+  //     };
+
+  //     if (updateData.variants) {
+  //       updateData.variants = parseArray(updateData.variants);
+  //     }
+  //     if (updateData.imageUrls) {
+  //       updateData.imageUrls = parseArray(updateData.imageUrls);
+  //     }
+  //     if (updateData.features) {
+  //       updateData.features = parseArray(updateData.features);
+  //     }
+  //     if (updateData.tags) {
+  //       updateData.tags = parseArray(updateData.tags);
+  //     }
+
+  //     // Find existing product
+  //     const existingProduct = await Product.findById(id);
+  //     if (!existingProduct) {
+  //       return res.status(404).json({
+  //         success: false,
+  //         message: 'Product not found'
+  //       });
+  //     }
+
+  //     // Handle new images
+  //     let images = [...existingProduct.images];
+      
+  //     // Add new images from URLs
+  //     if (updateData.imageUrls && updateData.imageUrls.length > 0) {
+  //       const urlImages = processImageUrls(updateData.imageUrls);
+  //       images.push(...urlImages);
+  //       delete updateData.imageUrls;
+  //     }
+      
+  //     // Add uploaded images
+  //     if (req.files && req.files.length > 0) {
+  //       const uploadedImages = await processImages(req.files);
+  //       images.push(...uploadedImages);
+  //     }
+
+  //     // If we have new images, update the images array
+  //     if (images.length !== existingProduct.images.length || 
+  //         JSON.stringify(images) !== JSON.stringify(existingProduct.images)) {
+  //       updateData.images = images;
+  //     }
+
+  //     // Convert numeric fields
+  //     if (updateData.price) updateData.price = Number(updateData.price);
+  //     if (updateData.discount) updateData.discount = Number(updateData.discount);
+  //     if (updateData.stock) updateData.stock = Number(updateData.stock);
+  //     if (updateData.rating) updateData.rating = Number(updateData.rating);
+  //     if (updateData.reviewsCount) updateData.reviewsCount = Number(updateData.reviewsCount);
+
+  //     // Update product
+  //     const updatedProduct = await Product.findByIdAndUpdate(
+  //       id,
+  //       updateData,
+  //       {
+  //         new: true,
+  //         runValidators: true
+  //       }
+  //     ).select('-__v');
+
+  //     res.status(200).json({
+  //       success: true,
+  //       message: 'Product updated successfully',
+  //       data: updatedProduct
+  //     });
+  //   } catch (error) {
+  //     console.error('Update product error:', error);
+      
+  //     if (error.name === 'ValidationError') {
+  //       const errors = Object.values(error.errors).map(err => err.message);
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: 'Validation error',
+  //         errors
+  //       });
+  //     }
+
+  //     if (error.name === 'CastError') {
+  //       return res.status(400).json({
+  //         success: false,
+  //         message: 'Invalid product ID'
+  //       });
+  //     }
+
+  //     res.status(500).json({
+  //       success: false,
+  //       message: 'Error updating product'
+  //     });
+  //   }
+  // };
+// Updated updateProduct function with proper image handling
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updateData = { ...req.body };
+
+    // Parse arrays if they are strings
+    const parseArray = (data) => {
+      if (!data) return undefined;
+      if (Array.isArray(data)) return data;
+      if (typeof data === 'string') {
+        try {
+          return JSON.parse(data);
+        } catch {
+          return [data];
         }
-        return undefined;
-      };
+      }
+      return undefined;
+    };
 
-      if (updateData.variants) {
-        updateData.variants = parseArray(updateData.variants);
-      }
-      if (updateData.imageUrls) {
-        updateData.imageUrls = parseArray(updateData.imageUrls);
-      }
-      if (updateData.features) {
-        updateData.features = parseArray(updateData.features);
-      }
-      if (updateData.tags) {
-        updateData.tags = parseArray(updateData.tags);
-      }
+    if (updateData.variants) {
+      updateData.variants = parseArray(updateData.variants);
+    }
+    if (updateData.features) {
+      updateData.features = parseArray(updateData.features);
+    }
+    if (updateData.tags) {
+      updateData.tags = parseArray(updateData.tags);
+    }
 
-      // Find existing product
-      const existingProduct = await Product.findById(id);
-      if (!existingProduct) {
-        return res.status(404).json({
-          success: false,
-          message: 'Product not found'
-        });
-      }
-
-      // Handle new images
-      let images = [...existingProduct.images];
-      
-      // Add new images from URLs
-      if (updateData.imageUrls && updateData.imageUrls.length > 0) {
-        const urlImages = processImageUrls(updateData.imageUrls);
-        images.push(...urlImages);
-        delete updateData.imageUrls;
-      }
-      
-      // Add uploaded images
-      if (req.files && req.files.length > 0) {
-        const uploadedImages = await processImages(req.files);
-        images.push(...uploadedImages);
-      }
-
-      // If we have new images, update the images array
-      if (images.length !== existingProduct.images.length || 
-          JSON.stringify(images) !== JSON.stringify(existingProduct.images)) {
-        updateData.images = images;
-      }
-
-      // Convert numeric fields
-      if (updateData.price) updateData.price = Number(updateData.price);
-      if (updateData.discount) updateData.discount = Number(updateData.discount);
-      if (updateData.stock) updateData.stock = Number(updateData.stock);
-      if (updateData.rating) updateData.rating = Number(updateData.rating);
-      if (updateData.reviewsCount) updateData.reviewsCount = Number(updateData.reviewsCount);
-
-      // Update product
-      const updatedProduct = await Product.findByIdAndUpdate(
-        id,
-        updateData,
-        {
-          new: true,
-          runValidators: true
-        }
-      ).select('-__v');
-
-      res.status(200).json({
-        success: true,
-        message: 'Product updated successfully',
-        data: updatedProduct
-      });
-    } catch (error) {
-      console.error('Update product error:', error);
-      
-      if (error.name === 'ValidationError') {
-        const errors = Object.values(error.errors).map(err => err.message);
-        return res.status(400).json({
-          success: false,
-          message: 'Validation error',
-          errors
-        });
-      }
-
-      if (error.name === 'CastError') {
-        return res.status(400).json({
-          success: false,
-          message: 'Invalid product ID'
-        });
-      }
-
-      res.status(500).json({
+    // Find existing product
+    const existingProduct = await Product.findById(id);
+    if (!existingProduct) {
+      return res.status(404).json({
         success: false,
-        message: 'Error updating product'
+        message: 'Product not found'
       });
     }
-  };
+
+    let images = [...existingProduct.images];
+
+    // Parse imageUrls ONLY if provided (for NEW URLs)
+    let newImageUrls = parseArray(updateData.imageUrls);
+    if (newImageUrls && newImageUrls.length > 0) {
+      const urlImages = processImageUrls(newImageUrls);
+      images.push(...urlImages);
+      // Don't delete imageUrls from updateData yet
+    }
+
+    // Handle REMOVE images - expect image indexes or public_ids to remove
+    const imagesToRemove = parseArray(updateData.imagesToRemove); // e.g. [0, 2] or ['public_id1']
+    if (imagesToRemove && imagesToRemove.length > 0) {
+      // Delete from Cloudinary first
+      const removePromises = imagesToRemove.map(removeId => {
+        const imgIndex = parseInt(removeId);
+        if (!isNaN(imgIndex) && images[imgIndex]) {
+          const img = images[imgIndex];
+          if (img.public_id && img.public_id.startsWith('traditional-clothing/')) {
+            return cloudinary.uploader.destroy(img.public_id);
+          }
+        } else if (typeof removeId === 'string') {
+          // public_id provided
+          return cloudinary.uploader.destroy(removeId);
+        }
+        return Promise.resolve();
+      });
+
+      await Promise.all(removePromises);
+
+      // Filter out removed images
+      images = images.filter((img, index) => {
+        if (!isNaN(parseInt(imagesToRemove.find(id => parseInt(id) === index)))) {
+          return false;
+        }
+        return !imagesToRemove.includes(img.public_id);
+      });
+    }
+
+    // Add NEW uploaded images
+    if (req.files && req.files.length > 0) {
+      const uploadedImages = req.files.map(file => ({
+        url: file.path,
+        public_id: file.filename,
+        isPrimary: images.length === 0 // First image is primary if no images exist
+      }));
+      images.push(...uploadedImages);
+    }
+
+    // Set primary image if none exists
+    if (images.length > 0 && !images.some(img => img.isPrimary)) {
+      images[0].isPrimary = true;
+    }
+
+    // Update images in updateData
+    updateData.images = images;
+
+    // Clean up updateData - remove special fields
+    delete updateData.imageUrls;
+    delete updateData.imagesToRemove;
+
+    // Convert numeric fields
+    if (updateData.price !== undefined) updateData.price = Number(updateData.price);
+    if (updateData.discount !== undefined) updateData.discount = Number(updateData.discount);
+    if (updateData.stock !== undefined) updateData.stock = Number(updateData.stock);
+
+    // Update product
+    const updatedProduct = await Product.findByIdAndUpdate(
+      id,
+      updateData,
+      {
+        new: true,
+        runValidators: true
+      }
+    ).select('-__v');
+
+    res.status(200).json({
+      success: true,
+      message: 'Product updated successfully',
+      data: updatedProduct
+    });
+  } catch (error) {
+    console.error('Update product error:', error);
+    
+    if (error.name === 'ValidationError') {
+      const errors = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        success: false,
+        message: 'Validation error',
+        errors
+      });
+    }
+
+    if (error.name === 'CastError') {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Error updating product'
+    });
+  }
+};
 
   // Delete product
   exports.deleteProduct = async (req, res) => {

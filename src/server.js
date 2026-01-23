@@ -114,52 +114,201 @@
 
 // startServer();
 // src/server.js
+// const express = require('express');
+// const mongoose = require('mongoose');
+// const app = express();
+// require('dotenv').config();
+
+// app.use((req, res, next) => {
+//   // List of allowed origins
+//   const allowedOrigins = [
+//     'http://localhost:3001',
+//     'https://sohwais.com',
+//     'https://www.sohwais.com',
+//     'https://wild-be.vercel.app',
+//     'https://sohwaisdash.vercel.app',
+//     'https://springgreen-grouse-139779.hostingersite.com',
+//     'http://localhost:5173',
+//     'http://localhost:3000',
+//   ];
+
+//   const origin = req.headers.origin;
+  
+//   // If origin is in allowed list, set it dynamically
+//   if (allowedOrigins.includes(origin)) {
+//     res.setHeader('Access-Control-Allow-Origin', origin);
+//   }
+  
+//   // Set other CORS headers
+//   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+//   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin');
+//   res.setHeader('Access-Control-Allow-Credentials', 'true');
+//   res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  
+//   // Handle preflight
+//   if (req.method === 'OPTIONS') {
+//     return res.status(200).end();
+//   }
+  
+//   next();
+// });
+
+
+// const productRoutes = require('./routes/product.routes');
+// const orderRoutes = require('./routes/order.routes');
+// const Order = require('./models/Order');
+
+// const PORT = process.env.PORT || 5000;
+
+// // ====================
+// // CORS FIX - 100% WORKING
+// // ====================
+// // app.use((req, res, next) => {
+// //   // List of allowed origins
+// //   const allowedOrigins = [
+// //     'http://localhost:3001',
+// //     'https://sohwais.com',
+// //     'https://www.sohwais.com',
+// //     'https://wild-be.vercel.app',
+// //     'https://sohwaisdash.vercel.app',
+// //     'https://springgreen-grouse-139779.hostingersite.com',
+// //     'http://localhost:5173',
+// //     'http://localhost:3000',
+// //   ];
+
+// //   const origin = req.headers.origin;
+  
+// //   // If origin is in allowed list, set it dynamically
+// //   if (allowedOrigins.includes(origin)) {
+// //     res.setHeader('Access-Control-Allow-Origin', origin);
+// //   }
+  
+// //   // Set other CORS headers
+// //   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+// //   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin');
+// //   res.setHeader('Access-Control-Allow-Credentials', 'true');
+// //   res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
+  
+// //   // Handle preflight
+// //   if (req.method === 'OPTIONS') {
+// //     return res.status(200).end();
+// //   }
+  
+// //   next();
+// // });
+
+// // Body parsing
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: true }));
+
+// // Routes
+// app.use('/api/products', productRoutes);
+// app.use('/api/orders', orderRoutes);
+// // Health check with CORS test
+// app.get('/health', (req, res) => {
+//   console.log('Health check from origin:', req.headers.origin);
+  
+//   res.status(200).json({
+//     status: 'UP',
+//     timestamp: new Date().toISOString(),
+//     service: 'Traditional Clothing Ecommerce API',
+//     cors: 'Enabled',
+//     yourOrigin: req.headers.origin,
+//     allowedOrigins: [
+//       'http://localhost:3000',
+//       'http://localhost:3001',
+//       'http://localhost:5173'
+//     ]
+//   });
+// });
+
+
+
+// // 404 handler
+// app.use((req, res) => {
+//   console.log('404 for:', req.method, req.originalUrl);
+//   res.status(404).json({
+//     success: false,
+//     message: `Route ${req.method} ${req.originalUrl} not found`
+//   });
+// });
+
+// // Error handler
+// app.use((err, req, res, next) => {
+//   console.error('Error:', err);
+//   res.status(500).json({
+//     success: false,
+//     message: 'Internal server error',
+//     error: process.env.NODE_ENV === 'development' ? err.message : undefined
+//   });
+// });
+
+// // Start server
+// const startServer = async () => {
+//   try {
+//     // Connect to MongoDB
+//     await mongoose.connect(process.env.MONGO_URI);
+//     console.log('✅ MongoDB connected successfully');
+    
+//     // Start server
+//     app.listen(PORT, () => {
+//       console.log(`🚀 Server running on port ${PORT}`);
+//       console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+//       console.log(`📡 Products API: http://localhost:${PORT}/api/products`);
+//       console.log('✅ CORS enabled for:');
+//       console.log('   - http://localhost:3000');
+//       console.log('   - http://localhost:3001');
+//       console.log('   - http://localhost:5173');
+//       console.log('   - http://127.0.0.1:3000');
+//       console.log('   - http://127.0.0.1:3001');
+//     });
+//   } catch (error) {
+//     console.error('❌ Failed to start server:', error);
+//     process.exit(1);
+//   }
+// };
+
+// // Start the server
+// startServer();
+
+
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 require('dotenv').config();
 
 const productRoutes = require('./routes/product.routes');
 const orderRoutes = require('./routes/order.routes');
-const Order = require('./models/Order');
+
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// ====================
-// CORS FIX - 100% WORKING
-// ====================
-app.use((req, res, next) => {
-  // List of allowed origins
-  const allowedOrigins = [
-    'https://sohwais.com',
-    'https://www.sohwais.com',
-    'https://wild-be.vercel.app',
-    'https://sohwaisdash.vercel.app',
-    'https://springgreen-grouse-139779.hostingersite.com',
-    'http://localhost:5173',
-    'http://localhost:3000',
-    'http://127.0.0.1:3001'
-  ];
+// ✅ Proper CORS Setup
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://localhost:5173',
+  'https://sohwais.com',
+  'https://www.sohwais.com',
+  'https://wild-be.vercel.app',
+  'https://sohwaisdash.vercel.app',
+  'https://springgreen-grouse-139779.hostingersite.com',
+];
 
-  const origin = req.headers.origin;
-  
-  // If origin is in allowed list, set it dynamically
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
-  // Set other CORS headers
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept, Origin');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Expose-Headers', 'Content-Length, Content-Type');
-  
-  // Handle preflight
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (like Postman, curl)
+    if (!origin) return callback(null, true);
+
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      return callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+}));
+
 
 // Body parsing
 app.use(express.json());
@@ -168,29 +317,17 @@ app.use(express.urlencoded({ extended: true }));
 // Routes
 app.use('/api/products', productRoutes);
 app.use('/api/orders', orderRoutes);
-// Health check with CORS test
+
+// Health check
 app.get('/health', (req, res) => {
-  console.log('Health check from origin:', req.headers.origin);
-  
   res.status(200).json({
     status: 'UP',
     timestamp: new Date().toISOString(),
-    service: 'Traditional Clothing Ecommerce API',
-    cors: 'Enabled',
-    yourOrigin: req.headers.origin,
-    allowedOrigins: [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://localhost:5173'
-    ]
   });
 });
 
-
-
 // 404 handler
 app.use((req, res) => {
-  console.log('404 for:', req.method, req.originalUrl);
   res.status(404).json({
     success: false,
     message: `Route ${req.method} ${req.originalUrl} not found`
@@ -199,32 +336,21 @@ app.use((req, res) => {
 
 // Error handler
 app.use((err, req, res, next) => {
-  console.error('Error:', err);
+  console.error('Error:', err.message);
   res.status(500).json({
     success: false,
     message: 'Internal server error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined
   });
 });
 
 // Start server
 const startServer = async () => {
   try {
-    // Connect to MongoDB
     await mongoose.connect(process.env.MONGO_URI);
-    console.log('✅ MongoDB connected successfully');
-    
-    // Start server
+    console.log('✅ MongoDB connected');
+
     app.listen(PORT, () => {
       console.log(`🚀 Server running on port ${PORT}`);
-      console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-      console.log(`📡 Products API: http://localhost:${PORT}/api/products`);
-      console.log('✅ CORS enabled for:');
-      console.log('   - http://localhost:3000');
-      console.log('   - http://localhost:3001');
-      console.log('   - http://localhost:5173');
-      console.log('   - http://127.0.0.1:3000');
-      console.log('   - http://127.0.0.1:3001');
     });
   } catch (error) {
     console.error('❌ Failed to start server:', error);
@@ -232,5 +358,4 @@ const startServer = async () => {
   }
 };
 
-// Start the server
 startServer();
