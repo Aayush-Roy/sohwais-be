@@ -408,8 +408,9 @@
 
 # < ./uploaded-image.jpg
 # ------WebKitFormBoundary7MA4YWxkTrZu0gW
-@baseUrl = http://localhost:5000 
-# https://api.sohwais.com
+@baseUrl = https://api.sohwais.com 
+# http://localhost:5000 
+# 
 
 # https://api.sohwais.com
  
@@ -619,7 +620,7 @@ Content-Type: application/json
 GET {{api}}?category=Men&collection=Majestic+Linen&sortBy=price&sortOrder=asc
     
 ### 9. GET PRODUCTS BY CATEGORY (MEN)
-GET {{api}}/category/Women
+GET {{api}}/category/Men
 
 ### 10. GET PRODUCTS BY COLLECTION
 GET {{api}}/collection/Madhubani Collection
