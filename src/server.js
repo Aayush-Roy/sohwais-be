@@ -289,6 +289,7 @@ const allowedOrigins = [
   'http://localhost:3001',
   'http://localhost:5173',
   'https://sohwais.com',
+  'https://admin.sohwais.com',
   'https://www.sohwais.com',
   'https://wild-be.vercel.app',
   'https://sohwaisdash.vercel.app',
